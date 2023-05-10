@@ -2,7 +2,7 @@ import './App.css';
 import TodoTemplate from './components/TodoTemplate.js';
 import TodoInsert from './components/TodoInsert';
 import TodoList from './components/TodoList';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useReducer, useRef, useState } from 'react';
 
 function createBulkTodos() {
   const array = [];
@@ -16,8 +16,22 @@ function createBulkTodos() {
   return array;
 }
 
-
+function todoReducer(todos, action) {
+  switch(action.type) {
+    case 'INSERT' :
+      return todos.concat(action.todo);
+    case 'REMOVE' :
+      return todos.filter(todo => todo.id !== action.id);
+    case 'TOGGLE' :
+      return todos.map(todo =>
+        todo.id === action.id ? {...todo, checked: !todo.checked } : todo,  
+      );
+    default:
+      return todos;
+  }
+}
 function App() {
+  const [todos, dispatch] = useReducer(todoReducer, undefined, createBulkTodos);
   const arr = [
     {
       id:1,
@@ -36,7 +50,7 @@ function App() {
     },
   ];
 
-const [todos, setTodos] = useState(createBulkTodos);
+// const [todos, setTodos] = useState(createBulkTodos);
 const nextId = useRef(4);
 const onInsert = useCallback(
   text => {
@@ -45,27 +59,30 @@ const onInsert = useCallback(
       text,
       checked : false,
     };
-    setTodos((todos) => todos.concat(todo));
+    // setTodos((todos) => todos.concat(todo));
+    dispatch({ type: 'INSERT', todo });
     nextId.current += 1; // nextId 1씩 더하기
   },
   [],
 );
 const onRemove = useCallback(
   (id) => {
-    setTodos((todos) => todos.filter((todo) => todo.id !== id));
+    dispatch({ type: 'REMOVE', id});
+    // setTodos((todos) => todos.filter((todo) => todo.id !== id));
   },
   [],
 );
 
 const onToggle = useCallback (
   id => {
-    setTodos((todos) =>
-      todos.map(todo => 
-        todo.id === id ? { ...todo, checked: !todo.checked} : todo,
-      ),
-    );
+    dispatch({ type: 'TOGGLE', id })
+    // setTodos((todos) =>
+    //   todos.map(todo => 
+    //     todo.id === id ? { ...todo, checked: !todo.checked} : todo,
+    //   ),
+    // );
   },
-  [todos],
+  [],
 );
 
 
