@@ -1,10 +1,14 @@
 import './App.css';
+import TodoTemplate from './components/TodoTemplate.js';
+import TodoInsert from './components/TodoInsert';
+import TodoList from './components/TodoList';
 
 function App() {
   return (
-    <div>
-      todo App을 만들자!
-    </div>
+    <TodoTemplate>
+      <TodoInsert />
+      <TodoList />
+    </TodoTemplate>
   );
 }
 
